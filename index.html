@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>인천버스 키오스크</title>
+		<meta name="description" content="인천버스 키오스크">
+		<meta name="author" content="minks">
+		<meta name="viewport" content="width=1080">
+		<link rel="shortcut icon" href="img/logo-favicon.ico">
+		<link rel="apple-touch-icon" href="img/logo-favicon.ico">
+		
+		<link href="css/reset.css" type="text/css" rel="stylesheet">
+		<link href="css/font.css" type="text/css" rel="stylesheet">
+		<link href="css/swiper.min.css" type="text/css" rel="stylesheet">
+        <link href="css/slick.css" type="text/css" rel="stylesheet">
+        <link href="css/slick-theme.css" type="text/css" rel="stylesheet">
+        <link href="css/jquery-ui.min.css" type="text/css" rel="stylesheet">
+		<link href="css/main.css" type="text/css" rel="stylesheet">
+		
+		<!--[if lt IE 9]>
+		<script src="js/jquery-1.11.1.min.js"></script>
+		<script src="js/html5shiv.js"></script>
+		<![endif]-->
+		
+		<!--[if gte IE 9]>
+		<script src="js/jquery-3.4.1.min.js"></script>
+		<![endif]-->
+		
+		<!--[if !IE]>--> 
+		<script src="js/jquery-3.4.1.min.js"></script>
+		<!--<![endif]-->
+		
+		<script src="js/jquery-migrate-1.4.1.min.js"></script>
+		<script src="js/swiper.min.js"></script>
+        <script src="js/slick.js"></script>
+        <script src="js/jquery-ui.min.js"></script>
+        <script src="js/main.js"></script>
+        
+        <!-- kakao map api-->
+		<script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=7c27b395b09309e57fc0371fe6668b50"></script>
+        
+        <!-- youtube api -->
+        <script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
+	</head>
+
+	<body>
+		<div class="wrap">
+            <!-- header -->
+            <header class="header">
+                <h1 class="not-view">header</h1>
+                
+                <div class="center-ct">
+                    <div class="h-left-area">
+                        <img src="img/logo.png" alt="로고" class="h-logo-img">
+                    </div>
+                    
+                    <div class="h-center-area">
+                        <div class="h-station-name">테크노파크역</div>
+                        <div class="h-station-number">38422</div>
+                    </div>
+                    
+                    <div class="h-right-area">
+                        <div class="h-weather-area">
+                            <div class="h-temperature">
+                                <!-- vTemperature : 현재 기온 -->
+                                <span id="vTemperature">24</span>℃
+                            </div>
+                            <div class="h-weather">
+                                <!-- vWeather : 현재 날씨 (sunny : 맑음, littleCloud : 구름조금, manyCloud : 구름많이, cloudy : 흐림, rain : 비, lightning : 번개, fog : 안개, snow : 눈) -->
+                                <div id="vWeather" class="h-weather-img" data-state="littleCloud"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- vTodayDate : 오늘 날짜 -->
+                        <div id="vTodayDate" class="h-today-date"></div>
+                        
+                        <!-- vTodayTime : 현재 시간 -->
+                        <div id="vTodayTime" class="h-today-time"></div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- content -->
+            <div class="c-wrap">
+                <!-- c-map : 지도 영역 -->
+                <section class="c-map center-ct">
+                    <article class="map-top-area">
+                        <div class="map-top-tit">도착 알림</div>
+                        
+                        <div class="map-top-arrive-area">
+                            <!-- vMapTopArriveList : 지도 영역에서 상단 도착 알림 목록 -->
+                            <ul id="vMapTopArriveList" class="map-top-arrive-list"></ul>
+                        </div>
+                    </article>
+                    
+                    <article class="map-main-area">
+                        <!-- vMapMainMap : 지도가 노출되는 영역 -->
+                        <div id="vMapMainMap" class="map-main-map"></div>
+                        
+                        <!-- map-main-tab-area : 지도 영역에서 하단 탭 -->
+                        <div class="map-main-tab-area">
+                            <ul class="map-main-tab-list">
+                                <!-- on : 탭을 선택했을 경우 -->
+                                <li data-tab-type="mapView">실시간 버스 현황</li>
+                                <li data-tab-type="routeSearch">노선 검색</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- on : 교통약자창이 안보일 경우 -->
+                        <div class="map-main-arrive-area on">
+                            <div class="map-main-arrive-tit">잠시 후 도착 버스 <span>Arrival Soon...</span></div>
+                            
+                            <div class="bus-arrive-list-area">
+                                <!-- vBusArriveList : 지도 영역에서 좌측에 잠시 후 도착 버스 목록 -->
+                                <ul id="vBusArriveList" class="bus-arrive-list swiper-wrapper">
+                                    <!-- on : 해당 버스를 선택했을 경우 -->
+                                    <li class="swiper-slide on" data-bus-id="인천00가1111">
+                                        <div class="bus-minute-area">
+                                            <div class="bus-minute">
+                                                <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                <span class="soon">곧 도착</span>
+                                            </div>
+                                        </div>
+                                        <div class="bus-number-area">
+                                            <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                            <div class="bus-number skyblue-item" onclick="setBusPosition(this);">9</div>
+                                        </div>
+                                    </li>
+                                    <li class="swiper-slide" data-bus-id="인천00나2222">
+                                        <div class="bus-minute-area">
+                                            <div class="bus-minute">
+                                                <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                <span class="number">2</span>분 후
+                                            </div>
+                                        </div>
+                                        <div class="bus-number-area">
+                                            <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                            <div class="bus-number red-item" onclick="setBusPosition(this);">M6450</div>
+                                        </div>
+                                    </li>
+                                    <li class="swiper-slide" data-bus-id="인천00다3333">
+                                        <div class="bus-minute-area">
+                                            <div class="bus-minute">
+                                                <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                <span class="number">2</span>분 후
+                                            </div>
+                                        </div>
+                                        <div class="bus-number-area">
+                                            <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                            <div class="bus-number green-item" onclick="setBusPosition(this);">순환 43</div>
+                                        </div>
+                                    </li>
+                                    <li class="swiper-slide" data-bus-id="인천00라4444">
+                                        <div class="bus-minute-area">
+                                            <div class="bus-minute">
+                                                <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                <span class="number">3</span>분 후
+                                            </div>
+                                        </div>
+                                        <div class="bus-number-area">
+                                            <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                            <div class="bus-number blue-item" onclick="setBusPosition(this);">급행 91</div>
+                                        </div>
+                                    </li>
+                                    <li class="swiper-slide" data-bus-id="인천00마5555">
+                                        <div class="bus-minute-area">
+                                            <div class="bus-minute">
+                                                <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                <span class="number">5</span>분 후
+                                            </div>
+                                        </div>
+                                        <div class="bus-number-area">
+                                            <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                            <div class="bus-number orange-item" onclick="setBusPosition(this);">303-1</div>
+                                        </div>
+                                    </li>
+                                    <li class="swiper-slide" data-bus-id="인천00바6666">
+                                        <div class="bus-minute-area">
+                                            <div class="bus-minute">
+                                                <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                <span class="number">7</span>분 후
+                                            </div>
+                                        </div>
+                                        <div class="bus-number-area">
+                                            <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                            <div class="bus-number skyblue-item" onclick="setBusPosition(this);">9</div>
+                                        </div>
+                                    </li>
+                                    <li class="swiper-slide" data-bus-id="인천00사7777">
+                                        <div class="bus-minute-area">
+                                            <div class="bus-minute">
+                                                <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                <span class="number">9</span>분 후
+                                            </div>
+                                        </div>
+                                        <div class="bus-number-area">
+                                            <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                            <div class="bus-number red-item" onclick="setBusPosition(this);">M6450</div>
+                                        </div>
+                                    </li>
+                                    <li class="swiper-slide" data-bus-id="인천00아8888">
+                                        <div class="bus-minute-area">
+                                            <div class="bus-minute">
+                                                <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                <span class="number">10</span>분 후
+                                            </div>
+                                        </div>
+                                        <div class="bus-number-area">
+                                            <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                            <div class="bus-number green-item" onclick="setBusPosition(this);">순환 43</div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- map-main-route-layer : 지도 영역에서 노선검색창 영역 -->
+                        <div class="l-area" id="map-main-route-layer">
+                            <div class="mmrl-box center-ct2">
+                                <!-- vRouteList : 노선검색창 내용 -->
+                                <div id="vRouteList" class="route-list-area"></div>
+                                
+                                <!-- vRouteLine : 노선안내창 (노선도보기) 내용 -->
+                                <div id="vRouteLine" class="route-line-area"></div>
+                                
+                                <!-- vRouteMap : 노선안내창 (지도보기) 내용 -->
+                                <div id="vRouteMap" class="route-map-area"></div>
+                            </div>
+                            <div class="mmrl-mask"></div>
+                        </div>
+                        
+                        <!-- map-main-menu-area : 지도 영역에서 우측 하단 메뉴 -->
+                        <div class="map-main-menu-area">
+                            <ul class="map-main-menu-list">
+                                <li data-menu-type="language">
+                                    <div class="menu-item">
+                                        <div class="menu-img">
+                                            <img src="img/icon-language.png" alt="언어설정">
+                                        </div>
+                                        <div class="menu-txt">Language</div>
+                                    </div>
+                                    
+                                    <ul class="language-list">
+                                        <li data-language-type="korea">
+                                            <div class="language-item">
+                                                <div class="language-img">
+                                                    <img src="img/icon-korea.png" alt="한국어">
+                                                </div>
+                                                <div class="language-txt">한국어</div>
+                                            </div>
+                                        </li>
+                                        <li data-language-type="japan">
+                                            <div class="language-item">
+                                                <div class="language-img">
+                                                    <img src="img/icon-japan.png" alt="일본어">
+                                                </div>
+                                                <div class="language-txt">日本語</div>
+                                            </div>
+                                        </li>
+                                        <li data-language-type="china">
+                                            <div class="language-item">
+                                                <div class="language-img">
+                                                    <img src="img/icon-china.png" alt="중국어">
+                                                </div>
+                                                <div class="language-txt">中国人</div>
+                                            </div>
+                                        </li>
+                                        <li data-language-type="usa">
+                                            <div class="language-item">
+                                                <div class="language-img">
+                                                    <img src="img/icon-usa.png" alt="영어">
+                                                </div>
+                                                <div class="language-txt">English</div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li data-menu-type="weakPedestrian">
+                                    <div class="menu-item">
+                                        <div class="menu-img">
+                                            <img src="img/icon-wheelchair.png" alt="교통약자">
+                                        </div>
+                                        <div class="menu-txt">교통약자</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- map-main-touch-layer : 지도 영역에서 화면터치 안내창 영역 -->
+                        <div class="l-area" id="map-main-touch-layer">
+                            <div class="mmtl-box">
+                                <div class="touch-img">
+                                    <img src="img/img-touch.png" alt="터치 이미지">
+                                </div>
+                                <div class="touch-txt">
+                                    <div class="big">화면을<br>터치하세요!</div>
+                                    <div class="small">실시간 버스를<br>확인하실 수 있습니다.</div>
+                                </div>
+                            </div>
+                            <div class="mmtl-mask"></div>
+                        </div>
+                    </article>
+                </section>
+                
+                <!-- c-news : 시정소식 영역 -->
+                <!-- c-news-empty : 시정소식이 없을 경우 -->
+                <section class="c-news center-ct">
+                    <article class="news-main-area">
+                        <div class="news-main-tit">시정소식 <span>NEWS</span></div>
+                        
+                        <!-- vNewsMain : 시정소식 제목과 내용 -->
+                        <div id="vNewsMain" class="swiper-nav">
+                            <ul class="swiper-wrapper">
+                                <li class="swiper-slide">
+                                    <div class="tit">“명품생태하천<br>&nbsp;승기천의 현재와 미래”</div>
+                                    <div class="con">
+                                        <p>연수구가 최근 인천시를 통해 승기천 워터프런트 사업예산 20억 원을 확보했다는 반가운 소식입니다.</p>
+                                        <p>연수구는 앞으로 이를 활용해 승기천을 계절별 테마가 있는 자연 생태 공간으로 조성해 구민들께 돌려드리겠는 계획입니다.</p>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="tit">“명품생태하천<br>&nbsp;승기천의 현재와 미래”</div>
+                                    <div class="con">
+                                        <p>연수구가 최근 인천시를 통해 승기천 워터프런트 사업예산 20억 원을 확보했다는 반가운 소식입니다.</p>
+                                        <p>연수구는 앞으로 이를 활용해 승기천을 계절별 테마가 있는 자연 생태 공간으로 조성해 구민들께 돌려드리겠는 계획입니다.</p>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="tit">“명품생태하천<br>&nbsp;승기천의 현재와 미래”</div>
+                                    <div class="con">
+                                        <p>연수구가 최근 인천시를 통해 승기천 워터프런트 사업예산 20억 원을 확보했다는 반가운 소식입니다.</p>
+                                        <p>연수구는 앞으로 이를 활용해 승기천을 계절별 테마가 있는 자연 생태 공간으로 조성해 구민들께 돌려드리겠는 계획입니다.</p>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="tit">“명품생태하천<br>&nbsp;승기천의 현재와 미래”</div>
+                                    <div class="con">
+                                        <p>연수구가 최근 인천시를 통해 승기천 워터프런트 사업예산 20억 원을 확보했다는 반가운 소식입니다.</p>
+                                        <p>연수구는 앞으로 이를 활용해 승기천을 계절별 테마가 있는 자연 생태 공간으로 조성해 구민들께 돌려드리겠는 계획입니다.</p>
+                                    </div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <div class="tit">“명품생태하천<br>&nbsp;승기천의 현재와 미래”</div>
+                                    <div class="con">
+                                        <p>연수구가 최근 인천시를 통해 승기천 워터프런트 사업예산 20억 원을 확보했다는 반가운 소식입니다.</p>
+                                        <p>연수구는 앞으로 이를 활용해 승기천을 계절별 테마가 있는 자연 생태 공간으로 조성해 구민들께 돌려드리겠는 계획입니다.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </article>
+                    
+                    <article class="news-video-area">
+                        <!-- vNewsVideo : 시정소식 동영상 -->
+                        <div id="vNewsVideo" class="swiper-for">
+                            <ul class="swiper-wrapper">
+                                <li class="swiper-slide">
+                                    <!-- news-video-youtube : 유튜브일 경우 -->
+                                    <div class="news-video-item news-video-youtube" data-youtube-id="m8NCeSvbm7Y"></div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <!-- news-video-file : 동영상일 경우 -->
+                                    <video class="news-video-item news-video-file" controls autoplay muted playsinline oncontextmenu="return false;">
+                                        <source src="img/1.mp4" type="video/mp4" />
+                                    </video>
+                                    <!--<div class="news-video-item news-video-youtube" data-youtube-id="tXgIsEFXUp8"></div>-->
+                                </li>
+                                <li class="swiper-slide">
+                                    <!-- news-video-img : 이미지일 경우, img-video-thumbnail.png : 대체이미지일 경우 -->
+                                    <div class="news-video-item news-video-img" style="background-image: url('img/img-video-thumbnail.png');"></div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <!-- news-video-youtube : 유튜브일 경우 -->
+                                    <div class="news-video-item news-video-youtube" data-youtube-id="RaFg9ZBjBA8"></div>
+                                </li>
+                                <li class="swiper-slide">
+                                    <!-- news-video-file : 동영상일 경우 -->
+                                    <video class="news-video-item news-video-file" controls autoplay muted playsinline oncontextmenu="return false;">
+                                        <source src="img/4.mp4" type="video/mp4" />
+                                    </video>
+                                    <!--<div class="news-video-item news-video-youtube" data-youtube-id="jw9crkSYaf4"></div>-->
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="swiper-for-arrow">
+                            <div class="swiper-for-prev-arrow"></div>
+                            <div class="swiper-for-next-arrow"></div>
+                        </div>
+                        <div class="swiper-for-pagination"></div>
+                    </article>
+                </section>
+                
+                <!-- c-weak-pedestrian : 교통약자창 영역 -->
+                <section class="c-weak-pedestrian">
+                    <article class="l-area" id="weak-pedestrian-layer">
+                        <div class="wpl-box center-ct2">
+                            <!-- vWplMain : 잠시 후 도착 버스창 내용 -->
+                            <div id="vWplMain" class="wpl-main-area">
+                                <div class="wpl-tit-area">
+                                    <div class="wpl-tit-left-area">
+                                        <img src="img/icon-wheelchair.png" alt="교통약자" class="wpl-tit-img">
+                                        <div class="wpl-tit-txt">잠시 후 도착 버스 <span>Arrival Soon...</span></div>
+                                    </div>
+                                    <div class="wpl-tit-right-area">
+                                        <button type="button" class="route-search-btn" onclick="setRouteSearch(this);">
+                                            <span>노선검색</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="wpl-con-area">
+                                    <div class="bus-arrive-list-area">
+                                        <!-- vBusArriveList2 : 잠시 후 도착 버스 목록 -->
+                                        <ul id="vBusArriveList2" class="bus-arrive-list swiper-wrapper">
+                                            <!-- on : 해당 버스를 선택했을 경우 -->
+                                            <li class="swiper-slide on" data-bus-id="인천00가1111">
+                                                <div class="bus-minute-area">
+                                                    <!-- commonbus-img : 일반버스, lowbus-img : 저상버스 -->
+                                                    <div class="bus-img commonbus-img"></div>
+                                                    <div class="bus-minute">
+                                                        <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                        <span class="soon">곧 도착</span>
+                                                    </div>
+                                                </div>
+                                                <div class="bus-number-area">
+                                                    <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                                    <div class="bus-number skyblue-item">9</div>
+                                                    <div class="bus-position">
+                                                        <button type="button" class="bus-position-btn" onclick="setBusPosition(this);">
+                                                            <span>위치보기</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="swiper-slide" data-bus-id="인천00나2222">
+                                                <div class="bus-minute-area">
+                                                    <!-- commonbus-img : 일반버스, lowbus-img : 저상버스 -->
+                                                    <div class="bus-img lowbus-img"></div>
+                                                    <div class="bus-minute">
+                                                        <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                        <span class="number">2</span>분 후
+                                                    </div>
+                                                </div>
+                                                <div class="bus-number-area">
+                                                    <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                                    <div class="bus-number red-item">M6450</div>
+                                                    <div class="bus-position">
+                                                        <button type="button" class="bus-position-btn" onclick="setBusPosition(this);">
+                                                            <span>위치보기</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="swiper-slide" data-bus-id="인천00다3333">
+                                                <div class="bus-minute-area">
+                                                    <!-- commonbus-img : 일반버스, lowbus-img : 저상버스 -->
+                                                    <div class="bus-img commonbus-img"></div>
+                                                    <div class="bus-minute">
+                                                        <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                        <span class="number">2</span>분 후
+                                                    </div>
+                                                </div>
+                                                <div class="bus-number-area">
+                                                    <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                                    <div class="bus-number green-item">순환 43</div>
+                                                    <div class="bus-position">
+                                                        <button type="button" class="bus-position-btn" onclick="setBusPosition(this);">
+                                                            <span>위치보기</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="swiper-slide" data-bus-id="인천00라4444">
+                                                <div class="bus-minute-area">
+                                                    <!-- commonbus-img : 일반버스, lowbus-img : 저상버스 -->
+                                                    <div class="bus-img commonbus-img"></div>
+                                                    <div class="bus-minute">
+                                                        <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                        <span class="number">3</span>분 후
+                                                    </div>
+                                                </div>
+                                                <div class="bus-number-area">
+                                                    <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                                    <div class="bus-number blue-item">급행 91</div>
+                                                    <div class="bus-position">
+                                                        <button type="button" class="bus-position-btn" onclick="setBusPosition(this);">
+                                                            <span>위치보기</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="swiper-slide" data-bus-id="인천00마5555">
+                                                <div class="bus-minute-area">
+                                                    <!-- commonbus-img : 일반버스, lowbus-img : 저상버스 -->
+                                                    <div class="bus-img commonbus-img"></div>
+                                                    <div class="bus-minute">
+                                                        <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                        <span class="number">5</span>분 후
+                                                    </div>
+                                                </div>
+                                                <div class="bus-number-area">
+                                                    <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                                    <div class="bus-number orange-item">303-1</div>
+                                                    <div class="bus-position">
+                                                        <button type="button" class="bus-position-btn" onclick="setBusPosition(this);">
+                                                            <span>위치보기</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="swiper-slide" data-bus-id="인천00바6666">
+                                                <div class="bus-minute-area">
+                                                    <!-- commonbus-img : 일반버스, lowbus-img : 저상버스 -->
+                                                    <div class="bus-img commonbus-img"></div>
+                                                    <div class="bus-minute">
+                                                        <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                        <span class="number">7</span>분 후
+                                                    </div>
+                                                </div>
+                                                <div class="bus-number-area">
+                                                    <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                                    <div class="bus-number skyblue-item">9</div>
+                                                    <div class="bus-position">
+                                                        <button type="button" class="bus-position-btn" onclick="setBusPosition(this);">
+                                                            <span>위치보기</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="swiper-slide" data-bus-id="인천00사7777">
+                                                <div class="bus-minute-area">
+                                                    <!-- commonbus-img : 일반버스, lowbus-img : 저상버스 -->
+                                                    <div class="bus-img lowbus-img"></div>
+                                                    <div class="bus-minute">
+                                                        <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                        <span class="number">9</span>분 후
+                                                    </div>
+                                                </div>
+                                                <div class="bus-number-area">
+                                                    <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                                    <div class="bus-number red-item">M6450</div>
+                                                    <div class="bus-position">
+                                                        <button type="button" class="bus-position-btn" onclick="setBusPosition(this);">
+                                                            <span>위치보기</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="swiper-slide" data-bus-id="인천00아8888">
+                                                <div class="bus-minute-area">
+                                                    <!-- commonbus-img : 일반버스, lowbus-img : 저상버스 -->
+                                                    <div class="bus-img commonbus-img"></div>
+                                                    <div class="bus-minute">
+                                                        <!-- soon : 곧 도착일 경우, number : 숫자일 경우 -->
+                                                        <span class="number">10</span>분 후
+                                                    </div>
+                                                </div>
+                                                <div class="bus-number-area">
+                                                    <!-- skyblue-item : 간선버스, red-item : 광역버스, red-item + red2-item : 공항버스, green-item : 지선버스, green-item + green2-item : 마을버스, blue-item : 급행버스, orange-item : 좌석버스 -->
+                                                    <div class="bus-number green-item">순환 43</div>
+                                                    <div class="bus-position">
+                                                        <button type="button" class="bus-position-btn" onclick="setBusPosition(this);">
+                                                            <span>위치보기</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="arrive-list-arrow">
+                                        <div class="arrive-list-prev-arrow"></div>
+                                        <div class="arrive-list-next-arrow"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- vRouteList2 : 노선검색창 내용 -->
+                            <div id="vRouteList2" class="route-list-area"></div>
+                            
+                            <!-- vRouteInfo : 노선안내창 (정보보기) 내용 -->
+                            <div id="vRouteInfo" class="route-info-area"></div>
+                            
+                            <!-- vRouteLine2 : 노선안내창 (노선도보기) 내용 -->
+                            <div id="vRouteLine2" class="route-line-area"></div>
+
+                            <!-- vRouteMap2 : 노선안내창 (지도보기) 내용 -->
+                            <div id="vRouteMap2" class="route-map-area"></div>
+                        </div>
+                        <button type="button" class="wpl-close-btn" onclick="closeLayer(this);">
+                            <span>교통약자창 닫기</span>
+                        </button>
+                        <div class="wpl-mask"></div>
+                    </article>
+                </section>
+            </div>
+            
+            <!-- layer -->
+            <div class="l-wrap">
+                <!-- alert창 -->
+                <div class="l-area" id="alert-layer">
+                    <div class="l-box">
+                        <div class="l-con-area">
+                            <div class="l-con"></div>
+                        </div>
+                        <div class="l-btn-area">
+                            <button type="button" class="confirm-btn">
+                                <span>확 인</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="l-mask"></div>
+                </div>
+                
+                <!-- confirm창 -->
+                <div class="l-area" id="confirm-layer">
+                    <div class="l-box">
+                        <div class="l-con-area">
+                            <div class="l-con"></div>
+                        </div>
+                        <div class="l-btn-area">
+                            <button type="button" class="close-btn" onclick="closeLayer(this);">
+                                <span>취 소</span>
+                            </button>
+                            <button type="button" class="confirm-btn">
+                                <span>확 인</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="l-mask"></div>
+                </div>
+                
+                <!-- 서비스 점검창 -->
+                <div class="l-area" id="inspection-layer">
+                    <div class="l-box">
+                        <div class="inspection-img">
+                            <img src="img/img-inspection.png" alt="점검 이미지">
+                        </div>
+                        <div class="inspection-txt">
+                            <div class="big"><span>서비스 점검중</span>입니다!</div>
+                            <div class="small">불편을 끼쳐드려 죄송합니다.</div>
+                            <div class="small">시스템 안정화를 위해 잠시 점검중입니다.<br>빠른 시간내에 정상적인 서비스가 가능하도록 최선을 다하겠습니다.<br>잠시만 기다려 주십시오.</div>
+                            <div class="small">감사합니다.</div>
+                        </div>
+                    </div>
+                    <div class="l-mask"></div>
+                </div>
+            </div>
+        </div>
+	</body>
+</html>
