@@ -1351,15 +1351,21 @@ function setNewsSlide() {
     
     //swiper 슬라이드 (시정소식 제목과 내용)
     if ($(".news-main-area .swiper-nav").length > 0) {
+        //20230728 수정부분 start
         swiperNav = new Swiper(".news-main-area .swiper-nav", {
             observer: true,
             observeParents: true,
             slidesPerView : 1,
             loop: true,
             effect: "flip",
-            allowTouchMove: false,
-            watchOverflow: true
+            /*allowTouchMove: false,*/
+            watchOverflow: true,
+            pagination: {
+                el: '.swiper-nav-pagination',
+                clickable: true,
+            },
         });
+        //20230728 수정부분 end
     }
     
     //swiper 슬라이드 (시정소식 동영상)
@@ -1368,6 +1374,7 @@ function setNewsSlide() {
         let playerArr2 = [];
         let slideTimer;
         
+        //20230728 수정부분 start
         swiperFor = new Swiper(".news-video-area .swiper-for", {
             observer: true,
             observeParents: true,
@@ -1384,9 +1391,9 @@ function setNewsSlide() {
                 el: '.swiper-for-pagination',
                 clickable: true,
             },
-            thumbs: {
+            /*thumbs: {
                 swiper: swiperNav
-            },
+            },*/
             on: {
                 init: function() {
                     //유튜브&동영상&이미지에 아이디 설정
@@ -1473,6 +1480,7 @@ function setNewsSlide() {
                 }
             }
         });
+        //20230728 수정부분 end
         
         //whenever youtube callback was called = deferred resolved
         //your custom function will be executed with YT as an argument
