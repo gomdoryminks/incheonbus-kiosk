@@ -1344,6 +1344,7 @@ header.header .h-right-area .h-today-time {
     display: -ms-flexbox;
     display: flex;
     flex-flow: column;
+    position: relative;
     margin-right: 12px;
     margin-bottom: 24px;
     padding: 30px 20px;
@@ -1433,6 +1434,30 @@ header.header .h-right-area .h-today-time {
 }
 .c-wrap .c-news .news-main-area .swiper-nav>ul>li .con p:first-child {
     margin-top: 0;
+}
+.c-wrap .c-news .news-main-area .swiper-nav-pagination {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    text-align: center;
+}
+.c-wrap .c-news .news-main-area .swiper-pagination-lock {
+    display: block;
+}
+.c-wrap .c-news .news-main-area .swiper-nav-pagination .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    margin: 10px 3px;
+    vertical-align: top;
+    background-color: #151f33;
+    opacity: 1;
+}
+.c-wrap .c-news .news-main-area .swiper-nav-pagination .swiper-pagination-bullet:only-child {
+    display: inline-block !important;
+}
+.c-wrap .c-news .news-main-area .swiper-nav-pagination .swiper-pagination-bullet-active {
+    background-color: #ffffff;
 }
 .c-wrap .c-news .news-video-area {
     width: 640px;
