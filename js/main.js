@@ -39,6 +39,13 @@ $(function() {
         } else if (dataMenuType == "weakPedestrian") {
             //교통약자창 열기
             openWeakPedestrianLayer();
+            
+        //20230823 수정부분 start    
+        } else if (dataMenuType == "home") {
+            //실시간 버스 현황 보기
+            setMapInit();
+        //20230823 수정부분 end
+            
         }
     });
     
@@ -86,6 +93,11 @@ $(function() {
     
     //서비스 점검창 열기
     //openInspectionLayer();
+    
+    //20230811 수정부분 start
+    //에러메시지창 열기
+    //openErrorLayer();
+    //20230811 수정부분 end
     
     //mapInit
     mapInit();
@@ -1783,6 +1795,36 @@ function openInspectionLayer() {
         event.preventDefault();
     });
 }
+
+//20230811 수정부분 start
+//에러메시지창 열기
+function openErrorLayer() {
+    $("#error-layer").addClass("on");
+    
+    let scrollTop = parseInt($(document).scrollTop());
+
+    $("body").css("top", -scrollTop + "px");
+
+    $("body").addClass("scroll-disable").on('scroll touchmove', function(event) {
+        event.preventDefault();
+    });
+}
+//20230811 수정부분 end
+
+//20230818 수정부분 start
+//에러메시지창 열기
+function openBusendLayer() {
+    $("#busend-layer").addClass("on");
+    
+    let scrollTop = parseInt($(document).scrollTop());
+
+    $("body").css("top", -scrollTop + "px");
+
+    $("body").addClass("scroll-disable").on('scroll touchmove', function(event) {
+        event.preventDefault();
+    });
+}
+//20230818 수정부분 end
 
 //레이어창 내에서 이동하기
 function moveLayer(obj, objId) {
